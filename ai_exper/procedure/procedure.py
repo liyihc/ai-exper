@@ -41,7 +41,7 @@ class Procedure:
         return self.data_path / 'results'
 
     @contextmanager
-    def add_steps(self, step_name: KT):
+    def add_step(self, step_name: KT):
         if isinstance(step_name, Enum):
             step_name = step_name.value
         assert step_name not in self.steps
@@ -50,7 +50,7 @@ class Procedure:
         self.current_step = step_name
         yield
 
-    def add_step(self, name: KT, step_type: Type[BaseStep]):
+    def add_step_choice(self, name: KT, step_type: Type[BaseStep]):
         assert self.current_step
         if isinstance(name, Enum):
             name = name.value
@@ -134,6 +134,7 @@ class Procedure:
         return mp
 
     def add_model_to_param(self, mp: 'MultiParameters', model: str, params: Union[BaseModel, None] = None):
+        assert model in self.models, f"model '{model}' not in {', '.join(self.models.keys())} "
         label = 97
         while (tmp_label := f'{model}_{chr(label)}') in mp.models:
             label += 1

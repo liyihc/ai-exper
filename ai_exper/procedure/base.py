@@ -1,5 +1,5 @@
 from pathlib import Path
-from pydantic import BaseModel as PydanticBaseModel
+from pydantic import BaseModel as PydanticBaseModel, Field as PydanticField
 
 
 class BaseStep(PydanticBaseModel):
@@ -23,3 +23,11 @@ class BaseModel(PydanticBaseModel):
     def handle(self, input_path: Path, output_path: Path):
         self.train(input_path, output_path)
         self.test(input_path, output_path)
+
+
+def Field(default=..., compare: bool = True, description=""):
+    return PydanticField(
+        default,
+        compare=compare,
+        description=description
+    )

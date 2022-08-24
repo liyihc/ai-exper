@@ -1,38 +1,35 @@
-import importlib
 from pathlib import Path
-from ai_exper.procedure import Procedure
-from . import base
+from . import common
 import typer
 
 
 def main():
     # cwd = Path.cwd()
 
-    path = Path("models.py")
-    assert path.exists()
-
     # models = importlib.import_module("models", "models.py")
+    import importlib
     import importlib.util
     import sys
+    sys.path.append(str(Path.cwd()))
 
-    spec = importlib.util.spec_from_file_location("models", path.absolute())
-    models = importlib.util.module_from_spec(spec)
-    sys.modules["models"] = models
-    spec.loader.exec_module(models)
+    import models
 
     assert hasattr(models, "procedure")
 
-    procedure: Procedure = getattr(models, "procedure")
+    common.set_module(models)
+    procedure = common.get_procedure()
 
-    base.datasets = next(iter(procedure.steps.values())).keys()
-    base.models = procedure.models.keys()
-
+    common.datasets.update(next(iter(procedure.steps.values())).keys())
+    common.models.update(procedure.models.keys())
 
     app = typer.Typer(no_args_is_help=True)
 
-    from . import gather, run
+    from . import run, gather_config, gather_custom
 
-    app.command()(run.run)
-    app.add_typer(gather.app, name="gather")
+    app.command("run")(run.run)
+    app.command("gather-config", no_args_is_help=True)(
+        gather_config.gather_config)
+    app.command("gather", no_args_is_help=True)(
+        gather_custom.gather_custom)
 
     app()
