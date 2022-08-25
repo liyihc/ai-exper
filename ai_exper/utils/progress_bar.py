@@ -37,6 +37,8 @@ class Bar:
             self,
             *args,
             description=""):
+        for arg in args:
+            assert not isinstance(arg, str), f"'{arg}' is not int, it's maybe description"
         return self.iter(
             range(*args),
             description=description)
